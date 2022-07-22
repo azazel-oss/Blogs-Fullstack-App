@@ -4,7 +4,6 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 
 // Database configuration
-
 const mongoose = require("mongoose");
 mongoose.connect(process.env.MONGODB_URI, {
   useUnifiedTopology: true,
@@ -14,8 +13,8 @@ const db = mongoose.connection;
 db.once("open", () => console.log("Connection established with the database"));
 db.on("error", console.error.bind(console, "mongo connection error"));
 
-var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users");
+const blogRouter = require("./routes/blog");
+const commentRouter = require("./routes/comment");
 
 var app = express();
 
@@ -24,7 +23,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use("/", indexRouter);
-app.use("/users", usersRouter);
+app.use("/api/blogs", blogRouter);
+app.use("/api/blogs/:blogId/comments", commentRouter);
 
 module.exports = app;
