@@ -2,7 +2,7 @@ const Blog = require("../models/blog");
 
 async function getAllBlogs(req, res, next) {
   const blogs = await Blog.find();
-  res.json({
+  res.status(200).json({
     blogs,
   });
 }
@@ -19,12 +19,12 @@ async function postBlog(req, res, next) {
   try {
     await blog.save();
   } catch (error) {
-    res.json({
+    res.status(500).json({
       text: "Something went wrong",
       error,
     });
   }
-  res.json({
+  res.status(200).json({
     text: "Blog created",
     blog,
   });
@@ -32,7 +32,7 @@ async function postBlog(req, res, next) {
 
 async function getBlogById(req, res, next) {
   const blog = await Blog.findById(req.params.blogId);
-  res.json({
+  res.status(200).json({
     blog,
   });
 }
@@ -46,30 +46,44 @@ async function updateBlog(req, res, next) {
     publishStatus: req.body.publishStatus,
   });
 
+  const oldBlog = await Blog.findById(req.params.blogId);
+
+  if (req.user._id.toString() !== oldBlog.author.toString())
+    return res.status(401).json({
+      message: "Sorry, you don't have the permission to update this data.",
+    });
+
   try {
     await Blog.findByIdAndUpdate(req.params.blogId, updatedBlog);
   } catch (error) {
-    res.json({
+    res.status(500).json({
       text: "Something went wrong",
       error,
     });
   }
-  res.json({
+  res.status(200).json({
     text: "Successfully updated",
     blog: updatedBlog,
   });
 }
 
 async function deleteBlog(req, res, next) {
+  const oldBlog = await Blog.findById(req.params.blogId);
+
+  if (req.user._id.toString() !== oldBlog.author.toString())
+    return res.status(401).json({
+      message: "Sorry, you don't have the permission to delete this data.",
+    });
+
   try {
     await Blog.findByIdAndDelete(req.params.blogId);
   } catch (error) {
-    res.json({
+    res.status(500).json({
       text: "Something went wrong",
       error,
     });
   }
-  res.json({
+  res.status(200).json({
     text: "Successfully deleted",
   });
 }

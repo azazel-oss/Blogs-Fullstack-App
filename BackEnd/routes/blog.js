@@ -1,4 +1,5 @@
 const express = require("express");
+const authenticate = require("../middlewares/authenticate");
 
 const {
   getAllBlogs,
@@ -14,15 +15,15 @@ const router = express.Router();
 router.get("/", getAllBlogs);
 
 // POST /api/blogs => create new blog
-router.post("/", postBlog);
+router.post("/", authenticate, postBlog);
 
 // GET /api/blogs/:blogId => get a single blog
 router.get("/:blogId", getBlogById);
 
 // PUT /api/blogs/:blogId => update a single blog
-router.put("/:blogId", updateBlog);
+router.put("/:blogId", authenticate, updateBlog);
 
 // DELETE /api/blogs/:blogId => delete a single blog
-router.delete("/:blogId", deleteBlog);
+router.delete("/:blogId", authenticate, deleteBlog);
 
 module.exports = router;
